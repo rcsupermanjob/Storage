@@ -13,10 +13,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: keep-alive
-        id: get-files
         run: |
             array=()
-            mapfile -d $'\0' array < <(find . -print0)
+            mapfile -d $'\0' array < <(find . -not -path "./.git/*" -not -path "./.github/*" -print0)
             for i in ${array[@]}
             do
                 echo $i
