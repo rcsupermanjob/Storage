@@ -15,8 +15,8 @@ jobs:
       - name: keep-alive
         run: |
             array=()
-            mapfile -d $'\0' array < <(find . -not -path "./.git/*" -not -path "./.github/*" -print0)
-            for i in  ${array[@]:1}
+            mapfile -d $'\0' array < <(find . -type f -not -path "./.git/*" -not -path "./.github/*" -print0)
+            for i in  ${array[@]}
             do
                 echo 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' ${i: 2}
                 curl -sIL -w "%{http_code} %{size_download} %{time_total}\n" -o /dev/null 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' ${i: 2} \
