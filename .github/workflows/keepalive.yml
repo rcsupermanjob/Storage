@@ -17,6 +17,6 @@ jobs:
       - name: Get Files
         id: get-files
         run: |
-            echo ::set-output name=files::$(find . -not -path "./github/*" -not -path "./git/*")
+            echo ::set-output name=files::$(find . -not -path "./.github/*" -not -path "./.git/*")
       - name: output
         run: echo ${{ steps.get-files.outputs.files }}
