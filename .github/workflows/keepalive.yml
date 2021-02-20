@@ -3,7 +3,7 @@ name: Keep CDN File Alive
 on:
   push:
     branches:    
-      - main
+      - master
   schedule:
     - cron: '*/10 * * * *'
 
