@@ -18,5 +18,18 @@ jobs:
             mapfile -d $'\0' array < <(find . -not -path "./.git/*" -not -path "./.github/*" -print0)
             for i in ${array[@]}
             do
-                echo $i
+                curl 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' ${i: 2} \
+                -H 'authority: cdn.jsdelivr.net' \
+                -H 'sec-ch-ua: "Chromium";v="88", "Google Chrome";v="88", ";Not\\A\"Brand";v="99"' \
+                -H 'sec-ch-ua-mobile: ?1' \
+                -H 'upgrade-insecure-requests: 1' \
+                -H 'user-agent: Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36' \
+                -H 'accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9' \
+                -H 'sec-fetch-site: same-origin' \
+                -H 'sec-fetch-mode: navigate' \
+                -H 'sec-fetch-user: ?1' \
+                -H 'sec-fetch-dest: document' \
+                -H 'referer: https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage/' \
+                -H 'accept-language: zh-CN,zh;q=0.9,en;q=0.8' \
+                --compressed
             done
