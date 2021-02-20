@@ -16,7 +16,7 @@ jobs:
         run: |
             array=()
             mapfile -d $'\0' array < <(find . -not -path "./.git/*" -not -path "./.github/*" -print0)
-            for i in ${array[@]}
+            for i in  ${array[@]:1}
             do
                 curl 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' ${i: 2} \
                 -H 'authority: cdn.jsdelivr.net' \
@@ -32,4 +32,5 @@ jobs:
                 -H 'referer: https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage/' \
                 -H 'accept-language: zh-CN,zh;q=0.9,en;q=0.8' \
                 --compressed
+                -s
             done
