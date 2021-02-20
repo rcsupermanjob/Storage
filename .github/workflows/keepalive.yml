@@ -10,14 +10,13 @@ on:
 jobs:
   issue:
     runs-on: ubuntu-latest
+    outputs:
+      files: ${{ steps.get-files.outputs.files }}
     steps:
       - uses: actions/checkout@v1
       - name: Get Files
-        uses: DovnarAlexander/github-action-file-detection@master
         id: get-files
-        with:
-          wildcard: '*'
-          exit_code_found: 1
-          exit_code_not_found: 0
+        run: |
+            echo ::set-output name=files::$(find . -not -path "./github/*" -not -path "./git/*")
       - name: output
-        run: echo "The result is ${{ steps.get-files.outputs.found }}"
+        run: echo "The result is ${{ steps.get-files.outputs.files }}"
