@@ -32,5 +32,5 @@ jobs:
                 -H 'referer: https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage/' \
                 -H 'accept-language: zh-CN,zh;q=0.9,en;q=0.8' \
                 --compressed
-                -s
+                -sIL -w "%{http_code}\n" -o /dev/null
             done
