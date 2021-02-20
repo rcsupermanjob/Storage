@@ -8,7 +8,7 @@ on:
     - cron: '*/30 * * * *'
 
 jobs:
-  issue:
+  keep-alive:
     runs-on: ubuntu-latest
     outputs:
       files: ${{ steps.get-files.outputs.files }}
@@ -19,4 +19,4 @@ jobs:
         run: |
             echo ::set-output name=files::$(find . -not -path "./github/*" -not -path "./git/*")
       - name: output
-        run: echo "The result is ${{ steps.get-files.outputs.files }}"
+        run: echo ${{ steps.get-files.outputs.files }}
