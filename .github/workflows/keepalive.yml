@@ -10,13 +10,14 @@ on:
 jobs:
   keep-alive:
     runs-on: ubuntu-latest
-    outputs:
-      files: ${{ steps.get-files.outputs.files }}
     steps:
       - uses: actions/checkout@v1
-      - name: Get Files
+      - name: keep-alive
         id: get-files
         run: |
-            echo ::set-output name=files::$(find . -not -path "./.github/*" -not -path "./.git/*")
-      - name: output
-        run: echo ${{ steps.get-files.outputs.files }}
+            array=()
+            mapfile -d $'\0' array < <(find . -print0)
+            for i in ${array[@]}
+            do
+                echo $i
+            done
