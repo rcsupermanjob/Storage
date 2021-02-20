@@ -18,8 +18,8 @@ jobs:
             mapfile -d $'\0' array < <(find . -type f -not -path "./.git/*" -not -path "./.github/*" -print0)
             for i in  ${array[@]}
             do
-                echo 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' ${i: 2}
-                curl -sIL -w "%{http_code} %{size_download} %{time_total}\n" -o /dev/null 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' ${i: 2} \
+                echo 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/'${i: 2}
+                curl -sIL -w "%{http_code} %{size_download} %{time_total}\n" -o /dev/null 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/'${i: 2} \
                 -H 'authority: cdn.jsdelivr.net' \
                 -H 'sec-ch-ua: "Chromium";v="88", "Google Chrome";v="88", ";Not\\A\"Brand";v="99"' \
                 -H 'sec-ch-ua-mobile: ?1' \
