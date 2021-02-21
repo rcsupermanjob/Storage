@@ -113,6 +113,7 @@ def request(filename):
                     connect_17ce(f'wss://wsapi.17ce.com:8001/socket/?user=yiqice@qq.com&code={code}&ut={ut}', url_1))
             else:
                 print(url_1, 'cant request 17ce')
+            time.sleep(5)
     except Exception as e:
         traceback.print_exc()
 
