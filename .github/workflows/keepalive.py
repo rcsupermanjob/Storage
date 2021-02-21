@@ -79,32 +79,32 @@ async def connect_17ce(wss_url, source_url):
             'type': 1,
         }
         await websocket.send(json.dumps(data))
-        with tqdm(total=190) as bar:
-            while True:
-                recv_text = await websocket.recv()
-                recv_json = json.loads(recv_text)
-                if recv_json['type'] == 'TaskEnd':
-                    print(source_url, 'finish 17ce')
-                    break
-                if recv_json['type'] == 'TaskErr':
-                    break
-                if recv_json['type'] == 'NewData':
-                    bar.update(1)
-
+        while True:
+            recv_text = await websocket.recv()
+            recv_json = json.loads(recv_text)
+            if recv_json['type'] == 'TaskEnd':
+                print(source_url, 'finish 17ce')
+                break
+            if recv_json['type'] == 'TaskErr':
+                break
+            if recv_json['type'] == 'NewData':
+                print(source_url, 'loading')
 
 def request(filename):
     try:
         for _ in range(3):
             url_1 = 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
             response = client.get(url_1, headers=headers_1)
-            print(url_1, response.status_code, f'{len(response.content) / 8 / 1024} KB')
+            print(url_1, response.status_code,
+                  f'{len(response.content) / 8 / 1024} KB')
             url_2 = "https://www.17ce.com/site/checkuser"
             payload = {
                 'url': url_1,
                 'type': 'cdn',
                 'isp': 0
             }
-            response = client.post(url_2, headers=headers_2, data=payload).json()
+            response = client.post(
+                url_2, headers=headers_2, data=payload).json()
             if response['rt']:
                 ut = response['data']['ut']
                 code = response['data']['code']
@@ -115,6 +115,7 @@ def request(filename):
             time.sleep(5)
     except Exception as e:
         traceback.print_exc()
+
 
 client = httpx.Client()
 for path, dir_list, file_list in os.walk("."):
