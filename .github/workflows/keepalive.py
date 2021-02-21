@@ -119,7 +119,6 @@ def request(filename):
         traceback.print_exc()
 
 client = httpx.Client()
-beijing = timezone(timedelta(hours=8))
 for path, dir_list, file_list in os.walk("."):
     if path.startswith('./.git') or path.startswith('./.github'):
         continue
