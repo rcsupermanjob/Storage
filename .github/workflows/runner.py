@@ -131,8 +131,8 @@ async def task_jsdelivr(filename):
 async def create_task():
     tasks = []
     sem = asyncio.Semaphore(3)
-    if len(sys.argv) == 0:
-        for path, dir_list, file_list in os.walk("."):
+    if len(sys.argv) == 1:
+        for path, _, file_list in os.walk("."):
             if path.startswith('./.git') or path.startswith('./.github'):
                 continue
             else:
@@ -143,8 +143,8 @@ async def create_task():
                         tasks.append(task_jsdelivr(
                             os.path.join(path, file_name)[2:]))
                     tasks.append(asyncio.sleep(3))
-    else:
-        for file_name in sys.argv:
+    elif len(sys.argv) > 1:
+        for file_name in sys.argv[1:]:
             if file_name.startswith('.git') or file_name.startswith('.github'):
                 continue
             else:
