@@ -11,7 +11,15 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: create-release
-      
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
   keep-alive:
     needs: create-release
     runs-on: ubuntu-latest
@@ -36,11 +44,4 @@ jobs:
       - name: Get Changed Files
         id: files
         uses: jitterbit/get-changed-files@v1
-      - name: Test 1
-        run: |
-            echo ${{ steps.files.outputs.all }}
-      - name: Test 2
-        run: |
-          for changed_file in ${{ steps.files.outputs.all }}; do
-            echo "Do something with this ${changed_file}."
-          done
+      - run: echo ${{ steps.files.outputs.all }}
