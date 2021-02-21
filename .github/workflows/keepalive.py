@@ -5,7 +5,6 @@ import os
 import httpx
 import websockets
 import traceback
-from tqdm import tqdm
 
 headers_1 = {
     'authority': 'cdn.jsdelivr.net',
@@ -21,6 +20,7 @@ headers_1 = {
     'sec-fetch-dest': 'document',
     'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
 }
+
 
 headers_2 = {
     'authority': 'www.17ce.com',
@@ -79,16 +79,17 @@ async def connect_17ce(wss_url, source_url):
             'type': 1,
         }
         await websocket.send(json.dumps(data))
-        while True:
-            recv_text = await websocket.recv()
-            recv_json = json.loads(recv_text)
-            if recv_json['type'] == 'TaskEnd':
-                print(source_url, 'finish 17ce')
-                break
-            if recv_json['type'] == 'TaskErr':
-                break
-            if recv_json['type'] == 'NewData':
-                print(source_url, 'loading')
+        # while True:
+        #     recv_text = await websocket.recv()
+        #     recv_json = json.loads(recv_text)
+        #     if recv_json['type'] == 'TaskEnd':
+        #         print(source_url, 'finish 17ce')
+        #         break
+        #     if recv_json['type'] == 'TaskErr':
+        #         break
+        #     if recv_json['type'] == 'NewData':
+        #         continue
+
 
 def request(filename):
     try:
