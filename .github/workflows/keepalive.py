@@ -97,7 +97,6 @@ async def task_17ce(filename, sem):
     except Exception as e:
         traceback.print_exc()
     finally:
-        await asyncio.sleep(3)
         sem.release()
 
 
@@ -138,7 +137,7 @@ async def create_task():
                 for _ in range(2):
                     tasks.append(task_17ce(os.path.join(path, file_name)[2:], sem))
                     tasks.append(task_jsdelivr(os.path.join(path, file_name)[2:]))
-                tasks.append(asyncio.sleep(5))
+                tasks.append(asyncio.sleep(3))
     await asyncio.gather(*tasks)
 
 
