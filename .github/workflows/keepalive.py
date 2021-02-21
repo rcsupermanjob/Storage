@@ -80,7 +80,6 @@ async def connect_17ce(wss_url, source_url):
         while True:
             recv_text = await websocket.recv()
             recv_json = json.loads(recv_text)
-            print(recv_json)
             if recv_json['type'] == 'TaskEnd':
                 print(source_url, 'finish 17ce')
                 break
@@ -89,7 +88,7 @@ async def connect_17ce(wss_url, source_url):
 def request(filename):
     url_1 = 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
     response = client.get(url_1, headers=headers_1)
-    print(url_1, response.status_code, len(response.content))
+    print(url_1, response.status_code, f'{len(response.content) / 8 / 1024} KB')
     url_2 = "https://www.17ce.com/site/checkuser"
     payload = {
         'url': url_1,
