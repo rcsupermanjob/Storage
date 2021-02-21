@@ -4,6 +4,7 @@ import time
 import os
 import httpx
 import websockets
+import traceback
 
 headers_1 = {
     'authority': 'cdn.jsdelivr.net',
@@ -86,25 +87,28 @@ async def connect_17ce(wss_url, source_url):
 
 
 def request(filename):
-    url_1 = 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
-    response = client.get(url_1, headers=headers_1)
-    print(url_1, response.status_code, f'{len(response.content) / 8 / 1024} KB')
-    url_2 = "https://www.17ce.com/site/checkuser"
-    payload = {
-        'url': url_1,
-        'type': 'cdn',
-        'isp': 0
-    }
-    response = client.post(url_2, headers=headers_2, data=payload).json()
-    if response['rt']:
-        ut = response['data']['ut']
-        code = response['data']['code']
-        asyncio.get_event_loop().run_until_complete(
-            connect_17ce(f'wss://wsapi.17ce.com:8001/socket/?user=yiqice@qq.com&code={code}&ut={ut}', url_1))
-    else:
-        print(url_1, 'cant request 17ce')
-    time.sleep(5)
-
+    try:
+        for _ in range(3):
+            url_1 = 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
+            response = client.get(url_1, headers=headers_1)
+            print(url_1, response.status_code, f'{len(response.content) / 8 / 1024} KB')
+            url_2 = "https://www.17ce.com/site/checkuser"
+            payload = {
+                'url': url_1,
+                'type': 'cdn',
+                'isp': 0
+            }
+            response = client.post(url_2, headers=headers_2, data=payload).json()
+            if response['rt']:
+                ut = response['data']['ut']
+                code = response['data']['code']
+                asyncio.get_event_loop().run_until_complete(
+                    connect_17ce(f'wss://wsapi.17ce.com:8001/socket/?user=yiqice@qq.com&code={code}&ut={ut}', url_1))
+            else:
+                print(url_1, 'cant request 17ce')
+            time.sleep(5)
+    except Exception as e:
+        traceback.print_exc()
 
 client = httpx.Client()
 for path, dir_list, file_list in os.walk("."):
