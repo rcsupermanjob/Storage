@@ -117,9 +117,9 @@ def request(filename):
     except Exception as e:
         traceback.print_exc()
 
-
 client = httpx.Client()
 for path, dir_list, file_list in os.walk("."):
     if path != '.git' or path != './github':
         for file_name in file_list:
-            request(os.path.join(path, file_name)[2:])
+            print(os.path.join(path, file_name)[2:])
+            # request(os.path.join(path, file_name)[2:])
