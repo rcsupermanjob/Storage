@@ -26,4 +26,4 @@ jobs:
       - name: Install Dependences
         run: pip install httpx websockets
       - name: KeepAlive
-        run: python keepalive.py
+        run: python ./.github/workflows/keepalive.py
