@@ -8,7 +8,22 @@ on:
     - cron: '*/30 * * * *'
 
 jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: create-release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  
   keep-alive:
+    needs: create-release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
