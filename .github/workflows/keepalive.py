@@ -119,7 +119,7 @@ def request(filename):
 
 client = httpx.Client()
 for path, dir_list, file_list in os.walk("."):
-    if path != '.git' or path != './github':
+    if not path.startswith('./.git') or not path.startswith('./.github'):
         for file_name in file_list:
             print(path, os.path.join(path, file_name)[2:])
             # request(os.path.join(path, file_name)[2:])
