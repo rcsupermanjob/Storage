@@ -81,8 +81,11 @@ async def connect_17ce(wss_url, source_url):
         while True:
             recv_text = await websocket.recv()
             recv_json = json.loads(recv_text)
+            print(recv_json)
             if recv_json['type'] == 'TaskEnd':
                 print(source_url, 'finish 17ce')
+                break
+            if recv_json['type']  == 'TaskErr':
                 break
 
 
