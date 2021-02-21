@@ -27,6 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+      - name: Output IP
+        run: |
+            'curl ip.sb'
       - name: SetUp Python
         uses: actions/setup-python@v2
         with:
