@@ -123,5 +123,4 @@ for path, dir_list, file_list in os.walk("."):
         continue
     else:
         for file_name in file_list:
-            print(path, os.path.join(path, file_name)[2:])
-            # request(os.path.join(path, file_name)[2:])
+            request(os.path.join(path, file_name)[2:])
