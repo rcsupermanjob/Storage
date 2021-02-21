@@ -1,12 +1,13 @@
 import asyncio
 import json
-import time
-from datetime import datetime
 import os
+import sys
+import traceback
+from datetime import datetime
+
 import httpx
 import websockets
-import traceback
-import sys
+
 
 async def task_17ce(filename, sem):
     try:
@@ -119,7 +120,8 @@ async def task_jsdelivr(filename):
                 'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
             }
             response = await client.get(url, headers=headers)
-            print(datetime.utcnow(), url, response.status_code, f'{len(response.content) / 8 / 1024} KB')
+            print(datetime.utcnow(), url, response.status_code,
+                  f'{len(response.content) / 8 / 1024} KB')
     except Exception as e:
         traceback.print_exc()
     finally:
@@ -136,11 +138,20 @@ async def create_task():
             else:
                 for file_name in file_list:
                     for _ in range(2):
-                        tasks.append(task_17ce(os.path.join(path, file_name)[2:], sem))
-                        tasks.append(task_jsdelivr(os.path.join(path, file_name)[2:]))
+                        tasks.append(
+                            task_17ce(os.path.join(path, file_name)[2:], sem))
+                        tasks.append(task_jsdelivr(
+                            os.path.join(path, file_name)[2:]))
                     tasks.append(asyncio.sleep(3))
     else:
-        pass
+        for file_name in sys.argv:
+            if file_name.startswith('.git') or file_name.startswith('.github'):
+                continue
+            else:
+                for _ in range(2):
+                    tasks.append(task_17ce(file_name, sem))
+                    tasks.append(task_jsdelivr(file_name))
+                    tasks.append(asyncio.sleep(3))
     await asyncio.gather(*tasks)
 
 
