@@ -1,6 +1,7 @@
 import asyncio
 import json
 import time
+from datetime import datetime
 import os
 import httpx
 import websockets
@@ -43,9 +44,9 @@ async def connect_17ce(wss_url, source_url):
         login_text = await websocket.recv()
         login_json = json.loads(login_text)
         if login_json['msg'] == 'login ok':
-            print(source_url, 'start 17ce')
+            print(datetime.utcnow(), source_url, 'start 17ce')
         else:
-            print(source_url, 'login failed')
+            print(datetime.utcnow(), source_url, 'login failed')
         data = {
             'AutoDecompress': False,
             'Cookie': "",
@@ -96,7 +97,7 @@ def request(filename):
         for _ in range(3):
             url_1 = 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
             response = client.get(url_1, headers=headers_1)
-            print(url_1, response.status_code,
+            print(datetime.utcnow(), url_1, response.status_code,
                   f'{len(response.content) / 8 / 1024} KB')
             url_2 = "https://www.17ce.com/site/checkuser"
             payload = {
@@ -112,12 +113,13 @@ def request(filename):
                 asyncio.get_event_loop().run_until_complete(
                     connect_17ce(f'wss://wsapi.17ce.com:8001/socket/?user=yiqice@qq.com&code={code}&ut={ut}', url_1))
             else:
-                print(url_1, 'cant request 17ce')
+                print(datetime.utcnow(), url_1, 'cant request 17ce')
             time.sleep(5)
     except Exception as e:
         traceback.print_exc()
 
 client = httpx.Client()
+beijing = timezone(timedelta(hours=8))
 for path, dir_list, file_list in os.walk("."):
     if path.startswith('./.git') or path.startswith('./.github'):
         continue
