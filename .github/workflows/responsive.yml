@@ -1,0 +1,44 @@
+name: Responsive Of Files
+
+on:
+  push:
+    branches:    
+      - master
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: create-release
+      
+  keep-alive:
+    needs: create-release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Output IP
+        run: |
+             curl -s "ip.sb"
+      - name: SetUp Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Cache Dependences
+        uses: actions/cache@v2
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('./.github/workflows/responsive.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Install Dependences
+        run: pip install httpx websockets
+      - name: Get Changed Files
+        id: files
+        uses: jitterbit/get-changed-files@v1
+      - run: |
+          echo ${{ steps.files.outputs.all }}
+      - run: |
+          for changed_file in ${{ steps.files.outputs.all }}; do
+            echo "Do something with this ${changed_file}."
+          done

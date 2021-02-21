@@ -1,9 +1,6 @@
 name: Keep CDN File Alive
 
 on:
-  push:
-    branches:    
-      - master
   schedule:
     - cron: '*/30 * * * *'
 
@@ -38,10 +35,10 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('./.github/workflows/build.yml') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('./.github/workflows/schedule.yml') }}
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Install Dependences
         run: pip install httpx websockets
       - name: KeepAlive
-        run: python ./.github/workflows/keepalive.py
+        run: python ./.github/workflows/runner.py

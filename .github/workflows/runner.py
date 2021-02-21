@@ -6,7 +6,7 @@ import os
 import httpx
 import websockets
 import traceback
-
+import sys
 
 async def task_17ce(filename, sem):
     try:
@@ -129,15 +129,18 @@ async def task_jsdelivr(filename):
 async def create_task():
     tasks = []
     sem = asyncio.Semaphore(3)
-    for path, dir_list, file_list in os.walk("."):
-        if path.startswith('./.git') or path.startswith('./.github'):
-            continue
-        else:
-            for file_name in file_list:
-                for _ in range(2):
-                    tasks.append(task_17ce(os.path.join(path, file_name)[2:], sem))
-                    tasks.append(task_jsdelivr(os.path.join(path, file_name)[2:]))
-                tasks.append(asyncio.sleep(3))
+    if len(sys.argv) == 0:
+        for path, dir_list, file_list in os.walk("."):
+            if path.startswith('./.git') or path.startswith('./.github'):
+                continue
+            else:
+                for file_name in file_list:
+                    for _ in range(2):
+                        tasks.append(task_17ce(os.path.join(path, file_name)[2:], sem))
+                        tasks.append(task_jsdelivr(os.path.join(path, file_name)[2:]))
+                    tasks.append(asyncio.sleep(3))
+    else:
+        pass
     await asyncio.gather(*tasks)
 
 
