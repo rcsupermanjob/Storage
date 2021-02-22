@@ -13,6 +13,7 @@ import websockets
 async def task_17ce(filename, sem):
     try:
         await sem.acquire()
+        await asyncio.sleep(random.randint(1, 5))
         url = "https://www.17ce.com/site/checkuser"
         headers = {
             'authority': 'www.17ce.com',
@@ -95,7 +96,7 @@ async def task_17ce(filename, sem):
                 else:
                     print(datetime.utcnow(), filename, 'login failed')
             else:
-                print(datetime.utcnow(), filename, 'cant request 17ce')
+                print(datetime.utcnow(), filename, 'cant request 17ce', response)
     except Exception as e:
         traceback.print_exc()
     finally:
