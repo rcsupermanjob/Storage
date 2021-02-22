@@ -1,0 +1,1 @@
+[![](https://data.jsdelivr.com/v1/package/gh/rcsupermanjob/Storage/badge)](https://www.jsdelivr.com/package/gh/rcsupermanjob/Storage)
