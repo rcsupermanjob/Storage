@@ -154,6 +154,7 @@ async def create_task():
                 for _ in range(3):
                     tasks.append(task_17ce(file_name, sem))
                     tasks.append(task_jsdelivr(file_name))
+    tasks = random.shuffle(tasks)
     await asyncio.gather(*tasks)
 
 
