@@ -4,6 +4,7 @@ import os
 import sys
 import traceback
 from datetime import datetime
+import random
 
 import httpx
 import websockets
@@ -32,7 +33,7 @@ async def task_17ce(filename, sem):
             'type': 'cdn',
             'isp': 0
         }
-        async with httpx.AsyncClient() as client:
+        async with httpx.AsyncClient(timeout=20) as client:
             response = await client.post(url, headers=headers, data=payload)
             response = response.json()
             if response['rt']:
@@ -98,6 +99,7 @@ async def task_17ce(filename, sem):
     except Exception as e:
         traceback.print_exc()
     finally:
+        await asyncio.sleep(random.randint(1, 5))
         sem.release()
 
 
@@ -148,10 +150,9 @@ async def create_task():
             if file_name.startswith('.git') or file_name.startswith('.github'):
                 continue
             else:
-                for _ in range(2):
+                for _ in range(3):
                     tasks.append(task_17ce(file_name, sem))
                     tasks.append(task_jsdelivr(file_name))
-                    tasks.append(asyncio.sleep(3))
     await asyncio.gather(*tasks)
 
 
