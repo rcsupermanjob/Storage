@@ -238,7 +238,8 @@ async def task_chinaz(filename, sem):
                 'Referer': url,
                 'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
             }
-            response = httpx.post(url, headers=headers, data=data).text.replace('\n', '').replace('\r', '').replace(' ', '')
+            response = httpx.post(url, headers=headers, data=data).text.replace('\n', '').replace('\r', '').replace(' ',
+                                                                                                                    '')
             enkey = parse.search('id="enkey"value="{}"', response)
             guids = parse.findall('divid="{}"class="rowlistwclearfix"', response)
             if enkey and guids:
@@ -263,12 +264,8 @@ async def task_chinaz(filename, sem):
                         'encode': enkey[0],
                         'checktype': 1
                     }
-                    response = await client.post(url, headers=headers, data=data)
-                    response = demjson.decode(response.text[1:][:-1])
-                    if 'result' in response and response['result']:
-                        continue
-                    else:
-                        print(datetime.utcnow(), filename, guid[0], enkey[0], 'chinaz results failed')
+                    await client.post(url, headers=headers, data=data)
+                print(datetime.utcnow(), filename, 'chinaz finish')
             else:
                 print(datetime.utcnow(), filename, 'chinaz enkey or guids failed')
     except httpx.ReadTimeout as e:
@@ -280,31 +277,27 @@ async def task_chinaz(filename, sem):
         sem.release()
 
 
-def init_chinaz():
-    url = 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/wallhaven-w8poq7.png'
-
-    data = {
-        'host': 'https://rc.sb/search.xml',
-        'linetype': '电信,多线,联通,移动'
-    }
-
-    headers = {
-        'Proxy-Connection': 'keep-alive',
-        'Cache-Control': 'max-age=0',
-        'Upgrade-Insecure-Requests': '1',
-        'Origin': 'http://tool.chinaz.com',
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-        'Referer': 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/cover.jpg',
-        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-        'Cookie': 'qHistory=aHR0cDovL3Rvb2wuY2hpbmF6LmNvbS9zcGVlZHRlc3QuYXNweF/lm73lhoXnvZHnq5nmtYvpgJ8=; speedtest=host=https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/cover.jpg'
-    }
-
-    response = httpx.post(url, headers=headers, data=data).text.replace('\n', '').replace('\r', '').replace(' ', '')
-    enkey = parse.search('id="enkey"value="{}"', response)
-    guids = parse.findall('divid="{}"class="rowlistwclearfix"', response)
-    return enkey, guids
+# def init_chinaz():
+#     url = 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/wallhaven-w8poq7.png'
+#     data = {
+#         'host': 'https://rc.sb/search.xml',
+#         'linetype': '电信,多线,联通,移动'
+#     }
+#     headers = {
+#         'Proxy-Connection': 'keep-alive',
+#         'Cache-Control': 'max-age=0',
+#         'Upgrade-Insecure-Requests': '1',
+#         'Origin': 'http://tool.chinaz.com',
+#         'Content-Type': 'application/x-www-form-urlencoded',
+#         'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36',
+#         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+#         'Referer': 'url',
+#         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
+#     }
+#     response = httpx.post(url, headers=headers, data=data).text.replace('\n', '').replace('\r', '').replace(' ', '')
+#     enkey = parse.search('id="enkey"value="{}"', response)
+#     guids = parse.findall('divid="{}"class="rowlistwclearfix"', response)
+#     return enkey, guids
 
 
 async def create_task():
