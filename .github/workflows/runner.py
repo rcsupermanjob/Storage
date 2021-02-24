@@ -221,7 +221,7 @@ async def task_chinaz(filename, sem):
     try:
         await sem.acquire()
         await asyncio.sleep(random.randint(1, 5))
-        async with httpx.AsyncClient(timeout=30) as client:
+        async with httpx.AsyncClient(timeout=60) as client:
             url = 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
             data = {
                 'host': 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename,
@@ -235,9 +235,8 @@ async def task_chinaz(filename, sem):
                 'Content-Type': 'application/x-www-form-urlencoded',
                 'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36',
                 'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-                'Referer': 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/cover.jpg',
-                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
-                'Cookie': 'qHistory=aHR0cDovL3Rvb2wuY2hpbmF6LmNvbS9zcGVlZHRlc3QuYXNweF/lm73lhoXnvZHnq5nmtYvpgJ8=; speedtest=host=https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/cover.jpg'
+                'Referer': url,
+                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
             }
             response = httpx.post(url, headers=headers, data=data).text.replace('\n', '').replace('\r', '').replace(' ', '')
             enkey = parse.search('id="enkey"value="{}"', response)
@@ -253,7 +252,7 @@ async def task_chinaz(filename, sem):
                         'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1',
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                         'Origin': 'http://tool.chinaz.com',
-                        'Referer': 'http://tool.chinaz.com/speedtest/https://rc.sb/search.xml',
+                        'Referer': 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename,
                         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
                     }
                     data = {
@@ -272,11 +271,40 @@ async def task_chinaz(filename, sem):
                         print(datetime.utcnow(), filename, guid[0], enkey[0], 'chinaz results failed')
             else:
                 print(datetime.utcnow(), filename, 'chinaz enkey or guids failed')
+    except httpx.ReadTimeout as e:
+        traceback.print_exc()
     except Exception as e:
         traceback.print_exc()
     finally:
         await asyncio.sleep(random.randint(10, 20))
         sem.release()
+
+
+def init_chinaz():
+    url = 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/wallhaven-w8poq7.png'
+
+    data = {
+        'host': 'https://rc.sb/search.xml',
+        'linetype': '电信,多线,联通,移动'
+    }
+
+    headers = {
+        'Proxy-Connection': 'keep-alive',
+        'Cache-Control': 'max-age=0',
+        'Upgrade-Insecure-Requests': '1',
+        'Origin': 'http://tool.chinaz.com',
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+        'Referer': 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/cover.jpg',
+        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+        'Cookie': 'qHistory=aHR0cDovL3Rvb2wuY2hpbmF6LmNvbS9zcGVlZHRlc3QuYXNweF/lm73lhoXnvZHnq5nmtYvpgJ8=; speedtest=host=https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/cover.jpg'
+    }
+
+    response = httpx.post(url, headers=headers, data=data).text.replace('\n', '').replace('\r', '').replace(' ', '')
+    enkey = parse.search('id="enkey"value="{}"', response)
+    guids = parse.findall('divid="{}"class="rowlistwclearfix"', response)
+    return enkey, guids
 
 
 async def create_task():
