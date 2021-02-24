@@ -7,6 +7,7 @@ from datetime import datetime
 import random
 
 import httpx
+import parse
 import websockets
 
 
@@ -14,27 +15,27 @@ async def task_17ce(filename, sem):
     try:
         await sem.acquire()
         await asyncio.sleep(random.randint(1, 5))
-        url = "https://www.17ce.com/site/checkuser"
-        headers = {
-            'authority': 'www.17ce.com',
-            'sec-ch-ua': '"Chromium";v="88", "Google Chrome";v="88", ";Not\\A"Brand";v="99"',
-            'accept': '*/*',
-            'x-requested-with': 'XMLHttpRequest',
-            'sec-ch-ua-mobile': '?1',
-            'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36',
-            'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'origin': 'https://www.17ce.com',
-            'sec-fetch-site': 'same-origin',
-            'sec-fetch-mode': 'cors',
-            'sec-fetch-dest': 'empty',
-            'referer': 'https://www.17ce.com/',
-            'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8', }
-        payload = {
-            'url': 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename,
-            'type': 'cdn',
-            'isp': 0
-        }
-        async with httpx.AsyncClient(timeout=20) as client:
+        async with httpx.AsyncClient(timeout=30) as client:
+            url = "https://www.17ce.com/site/checkuser"
+            headers = {
+                'authority': 'www.17ce.com',
+                'sec-ch-ua': '"Chromium";v="88", "Google Chrome";v="88", ";Not\\A"Brand";v="99"',
+                'accept': '*/*',
+                'x-requested-with': 'XMLHttpRequest',
+                'sec-ch-ua-mobile': '?1',
+                'user-agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36',
+                'content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'origin': 'https://www.17ce.com',
+                'sec-fetch-site': 'same-origin',
+                'sec-fetch-mode': 'cors',
+                'sec-fetch-dest': 'empty',
+                'referer': 'https://www.17ce.com/',
+                'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8', }
+            payload = {
+                'url': 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename,
+                'type': 'cdn',
+                'isp': 0
+            }
             response = await client.post(url, headers=headers, data=payload)
             response = response.json()
             if response['rt']:
@@ -131,6 +132,86 @@ async def task_jsdelivr(filename):
         await asyncio.sleep(1)
 
 
+async def task_ce8(filename, sem):
+    try:
+        await sem.acquire()
+        await asyncio.sleep(random.randint(1, 5))
+        async with httpx.AsyncClient(timeout=30) as client:
+            url = 'https://www.ce8.com/http/' + 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
+            params = {
+                'isp': 'telecom_mobile_unicom_tt_edu_mix'
+            }
+            headers = {
+                'Connection': 'keep-alive',
+                'sec-ch-ua': '"Chromium";v="88", "Google Chrome";v="88", ";Not\\A"Brand";v="99"',
+                'sec-ch-ua-mobile': '?1',
+                'Upgrade-Insecure-Requests': '1',
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                'Sec-Fetch-Site': 'same-origin',
+                'Sec-Fetch-Mode': 'navigate',
+                'Sec-Fetch-User': '?1',
+                'Sec-Fetch-Dest': 'document',
+                'Referer': url,
+                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+            }
+            response = await client.get(url, headers=headers, params=params)
+            response = response.text
+            token = parse.search('var token = "{}"', response)
+            if token:
+                print(datetime.utcnow(), filename, 'ce8 start')
+                await asyncio.sleep(30)
+                url = 'https://check1.ce8.com/api/check/site_all'
+                headers = {
+                    'Connection': 'keep-alive',
+                    'Accept': '*/*',
+                    'Access-Control-Request-Method': 'POST',
+                    'Access-Control-Request-Headers': 'content-type',
+                    'Origin': 'https://www.ce8.com',
+                    'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36',
+                    'Sec-Fetch-Mode': 'cors',
+                    'Sec-Fetch-Site': 'same-site',
+                    'Sec-Fetch-Dest': 'empty',
+                    'Referer': 'https://www.ce8.com/',
+                    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
+                }
+                await client.options(url, headers=headers)
+                data = {
+                    'token': token[0],
+                    'url': 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/logo.png'
+                }
+                headers = {
+                    'Connection': 'keep-alive',
+                    'sec-ch-ua': '"Chromium";v="88", "Google Chrome";v="88", ";Not\\A"Brand";v="99"',
+                    'Accept': 'application/json, text/javascript, */*; q=0.01',
+                    'sec-ch-ua-mobile': '?1',
+                    'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36',
+                    'Content-Type': 'application/json; charset=UTF-8',
+                    'Origin': 'https://www.ce8.com',
+                    'Sec-Fetch-Site': 'same-site',
+                    'Sec-Fetch-Mode': 'cors',
+                    'Sec-Fetch-Dest': 'empty',
+                    'Referer': 'https://www.ce8.com/',
+                    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
+                }
+                response = await client.post(url, headers=headers, json=data)
+                response = response.json()
+                if 'data' in response:
+                    if len(response['data']) > 0:
+                        print(datetime.utcnow(), filename, 'ce8 finish')
+                    else:
+                        print(datetime.utcnow(), filename, 'ce8 data null')
+                else:
+                    print(datetime.utcnow(), filename, 'ce8 result failed')
+            else:
+                print(datetime.utcnow(), filename, 'ce8 token failed')
+    except Exception as e:
+        traceback.print_exc()
+    finally:
+        await asyncio.sleep(random.randint(1, 5))
+        sem.release()
+
+
 async def create_task():
     tasks = []
     sem = asyncio.Semaphore(3)
@@ -140,20 +221,17 @@ async def create_task():
                 continue
             else:
                 for file_name in file_list:
-                    for _ in range(2):
-                        tasks.append(
-                            task_17ce(os.path.join(path, file_name)[2:], sem))
-                        tasks.append(task_jsdelivr(
-                            os.path.join(path, file_name)[2:]))
-                    tasks.append(asyncio.sleep(3))
+                    # tasks.append(task_17ce(os.path.join(path, file_name)[2:], sem))
+                    tasks.append(task_ce8(os.path.join(path, file_name)[2:], sem))
+                    tasks.append(task_jsdelivr(os.path.join(path, file_name)[2:]))
     elif len(sys.argv) > 1:
         for file_name in sys.argv[1:]:
             if file_name.startswith('.git') or file_name.startswith('.github'):
                 continue
             else:
-                for _ in range(3):
-                    tasks.append(task_17ce(file_name, sem))
-                    tasks.append(task_jsdelivr(file_name))
+                # tasks.append(task_17ce(file_name, sem))
+                tasks.append(task_ce8(file_name, sem))
+                tasks.append(task_jsdelivr(file_name))
     random.shuffle(tasks)
     await asyncio.gather(*tasks)
 
