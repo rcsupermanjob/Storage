@@ -2,6 +2,7 @@ import asyncio
 import json
 import os
 import sys
+import time
 import traceback
 from datetime import datetime
 import random
@@ -221,7 +222,7 @@ async def task_chinaz(filename, sem):
     try:
         await sem.acquire()
         await asyncio.sleep(random.randint(1, 5))
-        async with httpx.AsyncClient(timeout=60) as client:
+        async with httpx.AsyncClient(timeout=90) as client:
             url = 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
             data = {
                 'host': 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename,
@@ -244,6 +245,7 @@ async def task_chinaz(filename, sem):
             guids = parse.findall('divid="{}"class="rowlistwclearfix"', response)
             if enkey and guids:
                 print(datetime.utcnow(), filename, 'chinaz start')
+                tasks = list()
                 for guid in guids:
                     url = 'http://tool.chinaz.com/iframe.ashx?t=ping&callback='
                     headers = {
@@ -264,7 +266,8 @@ async def task_chinaz(filename, sem):
                         'encode': enkey[0],
                         'checktype': 1
                     }
-                    await client.post(url, headers=headers, data=data)
+                    tasks.append(client.post(url, headers=headers, data=data))
+                await asyncio.gather(*tasks)
                 print(datetime.utcnow(), filename, 'chinaz finish')
             else:
                 print(datetime.utcnow(), filename, 'chinaz enkey or guids failed')
@@ -275,29 +278,6 @@ async def task_chinaz(filename, sem):
     finally:
         await asyncio.sleep(random.randint(10, 20))
         sem.release()
-
-
-# def init_chinaz():
-#     url = 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/wallhaven-w8poq7.png'
-#     data = {
-#         'host': 'https://rc.sb/search.xml',
-#         'linetype': '电信,多线,联通,移动'
-#     }
-#     headers = {
-#         'Proxy-Connection': 'keep-alive',
-#         'Cache-Control': 'max-age=0',
-#         'Upgrade-Insecure-Requests': '1',
-#         'Origin': 'http://tool.chinaz.com',
-#         'Content-Type': 'application/x-www-form-urlencoded',
-#         'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36',
-#         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-#         'Referer': 'url',
-#         'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
-#     }
-#     response = httpx.post(url, headers=headers, data=data).text.replace('\n', '').replace('\r', '').replace(' ', '')
-#     enkey = parse.search('id="enkey"value="{}"', response)
-#     guids = parse.findall('divid="{}"class="rowlistwclearfix"', response)
-#     return enkey, guids
 
 
 async def create_task():
