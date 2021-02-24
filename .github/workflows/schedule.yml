@@ -39,6 +39,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Install Dependences
-        run: pip install httpx websockets parse
+        run: pip install httpx websockets parse demjson
       - name: KeepAlive
         run: python ./.github/workflows/runner.py

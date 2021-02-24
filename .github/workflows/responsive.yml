@@ -40,7 +40,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pip-
       - name: Install Dependences
-        run: pip install httpx websockets parse
+        run: pip install httpx websockets parse demjson
       - name: Get Changed Files
         id: files
         uses: jitterbit/get-changed-files@v1

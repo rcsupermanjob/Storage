@@ -8,6 +8,7 @@ import random
 
 import httpx
 import parse
+import demjson
 import websockets
 
 
@@ -36,7 +37,7 @@ async def task_17ce(filename, sem):
                 'type': 'cdn',
                 'isp': 0
             }
-            response = await client.post(url, headers=headers, data=payload)
+            response = await client.post(url=url, headers=headers, data=payload)
             response = response.json()
             if response['rt']:
                 ut = response['data']['ut']
@@ -123,7 +124,7 @@ async def task_jsdelivr(filename):
                 'sec-fetch-dest': 'document',
                 'accept-language': 'zh-CN,zh;q=0.9,en;q=0.8',
             }
-            response = await client.get(url, headers=headers)
+            response = await client.get(url=url, headers=headers)
             print(datetime.utcnow(), url, response.status_code,
                   f'{len(response.content) / 8 / 1024} KB')
     except Exception as e:
@@ -137,7 +138,7 @@ async def task_ce8(filename, sem):
         await sem.acquire()
         await asyncio.sleep(random.randint(1, 5))
         async with httpx.AsyncClient(timeout=30) as client:
-            url = 'https://www.ce8.com/http/' + 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
+            url = 'https://www.ce8.com/http/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
             params = {
                 'isp': 'telecom_mobile_unicom_tt_edu_mix'
             }
@@ -155,12 +156,11 @@ async def task_ce8(filename, sem):
                 'Referer': url,
                 'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
             }
-            response = await client.get(url, headers=headers, params=params)
+            response = await client.get(url=url, headers=headers, params=params)
             response = response.text
             token = parse.search('var token = "{}"', response)
             if token:
                 print(datetime.utcnow(), filename, 'ce8 start')
-                await asyncio.sleep(30)
                 url = 'https://check1.ce8.com/api/check/site_all'
                 headers = {
                     'Connection': 'keep-alive',
@@ -175,10 +175,10 @@ async def task_ce8(filename, sem):
                     'Referer': 'https://www.ce8.com/',
                     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
                 }
-                await client.options(url, headers=headers)
+                await client.options(url=url, headers=headers)
                 data = {
                     'token': token[0],
-                    'url': 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/logo.png'
+                    'url': 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
                 }
                 headers = {
                     'Connection': 'keep-alive',
@@ -194,15 +194,20 @@ async def task_ce8(filename, sem):
                     'Referer': 'https://www.ce8.com/',
                     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
                 }
-                response = await client.post(url, headers=headers, json=data)
-                response = response.json()
-                if 'data' in response:
-                    if len(response['data']) > 0:
-                        print(datetime.utcnow(), filename, 'ce8 finish')
+                count = 3
+                while count > 0:
+                    response = await client.post(url=url, headers=headers, json=data)
+                    response = response.json()
+                    count -= 1
+                    await asyncio.sleep(20)
+                    if 'data' in response and response['data']:
+                        if len(response['data']) > 0:
+                            print(datetime.utcnow(), filename, 'ce8 finish')
+                            break
+                        else:
+                            print(datetime.utcnow(), filename, 'ce8 data null')
                     else:
-                        print(datetime.utcnow(), filename, 'ce8 data null')
-                else:
-                    print(datetime.utcnow(), filename, 'ce8 result failed')
+                        print(datetime.utcnow(), filename, 'ce8 result failed')
             else:
                 print(datetime.utcnow(), filename, 'ce8 token failed')
     except Exception as e:
@@ -212,9 +217,71 @@ async def task_ce8(filename, sem):
         sem.release()
 
 
+async def task_chinaz(filename, sem):
+    try:
+        await sem.acquire()
+        await asyncio.sleep(random.randint(1, 5))
+        async with httpx.AsyncClient(timeout=30) as client:
+            url = 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
+            data = {
+                'host': 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename,
+                'linetype': '电信,多线,联通,移动'
+            }
+            headers = {
+                'Proxy-Connection': 'keep-alive',
+                'Cache-Control': 'max-age=0',
+                'Upgrade-Insecure-Requests': '1',
+                'Origin': 'http://tool.chinaz.com',
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'User-Agent': 'Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.182 Mobile Safari/537.36',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+                'Referer': 'http://tool.chinaz.com/speedtest/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/cover.jpg',
+                'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
+                'Cookie': 'qHistory=aHR0cDovL3Rvb2wuY2hpbmF6LmNvbS9zcGVlZHRlc3QuYXNweF/lm73lhoXnvZHnq5nmtYvpgJ8=; speedtest=host=https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/cover.jpg'
+            }
+            response = httpx.post(url, headers=headers, data=data).text.replace('\n', '').replace('\r', '').replace(' ', '')
+            enkey = parse.search('id="enkey"value="{}"', response)
+            guids = parse.findall('divid="{}"class="rowlistwclearfix"', response)
+            if enkey and guids:
+                print(datetime.utcnow(), filename, 'chinaz start')
+                for guid in guids:
+                    url = 'http://tool.chinaz.com/iframe.ashx?t=ping&callback='
+                    headers = {
+                        'Proxy-Connection': 'keep-alive',
+                        'Accept': 'text/javascript, application/javascript, application/ecmascript, application/x-ecmascript, */*; q=0.01',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'User-Agent': 'Mozilla/5.0 (iPad; CPU OS 11_0 like Mac OS X) AppleWebKit/604.1.34 (KHTML, like Gecko) Version/11.0 Mobile/15A5341f Safari/604.1',
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'Origin': 'http://tool.chinaz.com',
+                        'Referer': 'http://tool.chinaz.com/speedtest/https://rc.sb/search.xml',
+                        'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
+                    }
+                    data = {
+                        'guid': guid[0],
+                        'host': 'https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename,
+                        'ishost': 1,
+                        'isipv6': None,
+                        'encode': enkey[0],
+                        'checktype': 1
+                    }
+                    response = await client.post(url, headers=headers, data=data)
+                    response = demjson.decode(response.text[1:][:-1])
+                    if 'result' in response and response['result']:
+                        continue
+                    else:
+                        print(datetime.utcnow(), filename, guid[0], enkey[0], 'chinaz results failed')
+            else:
+                print(datetime.utcnow(), filename, 'chinaz enkey or guids failed')
+    except Exception as e:
+        traceback.print_exc()
+    finally:
+        await asyncio.sleep(random.randint(10, 20))
+        sem.release()
+
+
 async def create_task():
     tasks = []
-    sem = asyncio.Semaphore(3)
+    sem = asyncio.Semaphore(5)
     if len(sys.argv) == 1:
         for path, _, file_list in os.walk("."):
             if path.startswith('./.git') or path.startswith('./.github'):
@@ -224,6 +291,7 @@ async def create_task():
                     # tasks.append(task_17ce(os.path.join(path, file_name)[2:], sem))
                     tasks.append(task_ce8(os.path.join(path, file_name)[2:], sem))
                     tasks.append(task_jsdelivr(os.path.join(path, file_name)[2:]))
+                    tasks.append(task_chinaz(os.path.join(path, file_name)[2:], sem))
     elif len(sys.argv) > 1:
         for file_name in sys.argv[1:]:
             if file_name.startswith('.git') or file_name.startswith('.github'):
@@ -232,6 +300,7 @@ async def create_task():
                 # tasks.append(task_17ce(file_name, sem))
                 tasks.append(task_ce8(file_name, sem))
                 tasks.append(task_jsdelivr(file_name))
+                tasks.append(task_chinaz(file_name, sem))
     random.shuffle(tasks)
     await asyncio.gather(*tasks)
 
