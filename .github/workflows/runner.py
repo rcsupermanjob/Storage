@@ -102,6 +102,8 @@ async def task_17ce(filename, sem):
                       'cant request 17ce', response)
     except httpcore.CloseError:
         print(datetime.utcnow(), filename, '17ce too fast')
+    except httpx.ConnectTimeout:
+        print(datetime.utcnow(), filename, '17ce timeout')
     except httpx.ReadTimeout:
         print(datetime.utcnow(), filename, '17ce timeout')
     except Exception as e:
@@ -134,6 +136,8 @@ async def task_jsdelivr(filename):
                   f'{len(response.content) / 8 / 1024} KB')
     except httpcore.CloseError:
         print(datetime.utcnow(), filename, 'jsdelivr too fast')
+    except httpx.ConnectTimeout:
+        print(datetime.utcnow(), filename, 'jsdelivr timeout')
     except httpx.ReadTimeout:
         print(datetime.utcnow(), filename, 'jsdelivr timeout')
     except Exception as e:
@@ -219,8 +223,12 @@ async def task_ce8(filename, sem):
                         print(datetime.utcnow(), filename, 'ce8 result failed')
             else:
                 print(datetime.utcnow(), filename, 'ce8 token failed')
+    except httpcore.CloseError:
+        print(datetime.utcnow(), filename, 'ce8 too fast')
+    except httpx.ConnectTimeout:
+        print(datetime.utcnow(), filename, 'ce8 timeout')
     except httpx.ReadTimeout:
-        print(datetime.utcnow(), filename, 'cce8 timeout')
+        print(datetime.utcnow(), filename, 'ce8 timeout')
     except Exception as e:
         traceback.print_exc()
     finally:
@@ -284,6 +292,8 @@ async def task_chinaz(filename, sem):
                 print(datetime.utcnow(), filename, 'chinaz enkey or guids failed')
     except httpcore.CloseError:
         print(datetime.utcnow(), filename, 'chinaz too fast')
+    except httpx.ConnectTimeout:
+        print(datetime.utcnow(), filename, 'chinaz timeout')
     except httpx.ReadTimeout:
         print(datetime.utcnow(), filename, 'chinaz timeout')
     except Exception as e:
