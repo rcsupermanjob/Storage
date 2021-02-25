@@ -9,6 +9,7 @@ from datetime import datetime
 import httpx
 import parse
 import websockets
+import httpcore
 
 
 async def task_17ce(filename, sem):
@@ -99,6 +100,8 @@ async def task_17ce(filename, sem):
             else:
                 print(datetime.utcnow(), filename,
                       'cant request 17ce', response)
+    except httpcore.CloseError:
+        print(datetime.utcnow(), filename, '17ce too fast')
     except httpx.ReadTimeout:
         print(datetime.utcnow(), filename, '17ce timeout')
     except Exception as e:
@@ -129,7 +132,9 @@ async def task_jsdelivr(filename):
             response = await client.get(url=url, headers=headers)
             print(datetime.utcnow(), url, response.status_code,
                   f'{len(response.content) / 8 / 1024} KB')
-    except httpx.ReadTimeout as e:
+    except httpcore.CloseError:
+        print(datetime.utcnow(), filename, 'jsdelivr too fast')
+    except httpx.ReadTimeout:
         print(datetime.utcnow(), filename, 'jsdelivr timeout')
     except Exception as e:
         traceback.print_exc()
@@ -276,8 +281,9 @@ async def task_chinaz(filename, sem):
                 await asyncio.gather(*tasks)
                 print(datetime.utcnow(), filename, 'chinaz finish')
             else:
-                print(datetime.utcnow(), filename,
-                      'chinaz enkey or guids failed')
+                print(datetime.utcnow(), filename, 'chinaz enkey or guids failed')
+    except httpcore.CloseError:
+        print(datetime.utcnow(), filename, 'chinaz too fast')
     except httpx.ReadTimeout:
         print(datetime.utcnow(), filename, 'chinaz timeout')
     except Exception as e:
