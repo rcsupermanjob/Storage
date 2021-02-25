@@ -1,15 +1,13 @@
 import asyncio
 import json
 import os
+import random
 import sys
-import time
 import traceback
 from datetime import datetime
-import random
 
 import httpx
 import parse
-import demjson
 import websockets
 
 
@@ -99,7 +97,10 @@ async def task_17ce(filename, sem):
                 else:
                     print(datetime.utcnow(), filename, 'login failed')
             else:
-                print(datetime.utcnow(), filename, 'cant request 17ce', response)
+                print(datetime.utcnow(), filename,
+                      'cant request 17ce', response)
+    except httpx.ReadTimeout:
+        print(datetime.utcnow(), filename, '17ce timeout')
     except Exception as e:
         traceback.print_exc()
     finally:
@@ -128,6 +129,8 @@ async def task_jsdelivr(filename):
             response = await client.get(url=url, headers=headers)
             print(datetime.utcnow(), url, response.status_code,
                   f'{len(response.content) / 8 / 1024} KB')
+    except httpx.ReadTimeout as e:
+        print(datetime.utcnow(), filename, 'jsdelivr timeout')
     except Exception as e:
         traceback.print_exc()
     finally:
@@ -211,6 +214,8 @@ async def task_ce8(filename, sem):
                         print(datetime.utcnow(), filename, 'ce8 result failed')
             else:
                 print(datetime.utcnow(), filename, 'ce8 token failed')
+    except httpx.ReadTimeout:
+        print(datetime.utcnow(), filename, 'cce8 timeout')
     except Exception as e:
         traceback.print_exc()
     finally:
@@ -242,7 +247,8 @@ async def task_chinaz(filename, sem):
             response = httpx.post(url, headers=headers, data=data).text.replace('\n', '').replace('\r', '').replace(' ',
                                                                                                                     '')
             enkey = parse.search('id="enkey"value="{}"', response)
-            guids = parse.findall('divid="{}"class="rowlistwclearfix"', response)
+            guids = parse.findall(
+                'divid="{}"class="rowlistwclearfix"', response)
             if enkey and guids:
                 print(datetime.utcnow(), filename, 'chinaz start')
                 tasks = list()
@@ -270,9 +276,10 @@ async def task_chinaz(filename, sem):
                 await asyncio.gather(*tasks)
                 print(datetime.utcnow(), filename, 'chinaz finish')
             else:
-                print(datetime.utcnow(), filename, 'chinaz enkey or guids failed')
-    except httpx.ReadTimeout as e:
-        traceback.print_exc()
+                print(datetime.utcnow(), filename,
+                      'chinaz enkey or guids failed')
+    except httpx.ReadTimeout:
+        print(datetime.utcnow(), filename, 'chinaz timeout')
     except Exception as e:
         traceback.print_exc()
     finally:
@@ -290,9 +297,12 @@ async def create_task():
             else:
                 for file_name in file_list:
                     # tasks.append(task_17ce(os.path.join(path, file_name)[2:], sem))
-                    tasks.append(task_ce8(os.path.join(path, file_name)[2:], sem))
-                    tasks.append(task_jsdelivr(os.path.join(path, file_name)[2:]))
-                    tasks.append(task_chinaz(os.path.join(path, file_name)[2:], sem))
+                    tasks.append(
+                        task_ce8(os.path.join(path, file_name)[2:], sem))
+                    tasks.append(task_jsdelivr(
+                        os.path.join(path, file_name)[2:]))
+                    tasks.append(task_chinaz(
+                        os.path.join(path, file_name)[2:], sem))
     elif len(sys.argv) > 1:
         for file_name in sys.argv[1:]:
             if file_name.startswith('.git') or file_name.startswith('.github'):
