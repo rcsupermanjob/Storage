@@ -17,7 +17,7 @@ async def task_17ce(filename, sem):
     try:
         await sem.acquire()
         await asyncio.sleep(random.randint(1, 5))
-        async with httpx.AsyncClient(timeout=30) as client:
+        async with httpx.AsyncClient(timeout=90) as client:
             url = "https://www.17ce.com/site/checkuser"
             headers = {
                 'authority': 'www.17ce.com',
@@ -138,7 +138,7 @@ async def task_ce8(filename, sem):
     try:
         await sem.acquire()
         await asyncio.sleep(random.randint(1, 5))
-        async with httpx.AsyncClient(timeout=30) as client:
+        async with httpx.AsyncClient(timeout=90) as client:
             url = 'https://www.ce8.com/http/https://cdn.jsdelivr.net/gh/rcsupermanjob/Storage@latest/' + filename
             params = {
                 'isp': 'telecom_mobile_unicom_tt_edu_mix'
